@@ -43,10 +43,22 @@ func closeListener(listener net.Listener) {
 }
 
 func handleRequest(conn net.Conn) {
+	defer func() {
+		if closeErr := conn.Close(); closeErr != nil {
+			fmt.Println("Error closing connection:", closeErr.Error())
+		}
+	}()
+
 	message, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
+		return
 	}
-	fmt.Print("Message Received from the client: ", string(message))
-	conn.Close()
+
+	fmt.Print("Message Received:", string(message))
+
+	_, writeErr := conn.Write([]byte(message + "\n"))
+	if writeErr != nil {
+		fmt.Println("Error writing:", writeErr.Error())
+	}
 }
