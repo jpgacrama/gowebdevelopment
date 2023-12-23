@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -32,5 +33,6 @@ func startServer() {
 }
 
 func main() {
+	fmt.Printf("Open http://%s:%s/ in your browser.\nClick CTRL + C to exit", CONN_HOST, CONN_PORT)
 	startServer()
 }
