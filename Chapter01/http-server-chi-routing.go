@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"net/http"
 )
 
 const (
@@ -24,6 +26,16 @@ func PathVariableHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hi " + name))
 }
 
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte(fmt.Sprintf("Route %s %s not found", r.Method, r.URL.Path)))
+}
+
+func MethodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.Write([]byte(fmt.Sprintf("Route %s %s is not allowed", r.Method, r.URL.Path)))
+}
+
 func main() {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -32,5 +44,10 @@ func main() {
 	router.Post("/post", PostRequestHandler)
 	router.Put("/hello/{name}", PathVariableHandler)
 
+	// Default route handler for unrecognized routes
+	router.NotFound(NotFoundHandler)
+	router.MethodNotAllowed(MethodNotAllowedHandler)
+
+	fmt.Printf("Server listening on %s:%s\n", CONN_HOST, CONN_PORT)
 	http.ListenAndServe(CONN_HOST+":"+CONN_PORT, router)
 }
