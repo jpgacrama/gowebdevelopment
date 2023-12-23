@@ -8,26 +8,37 @@ import (
 )
 
 const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "8080"
-	CONN_TYPE = "tcp"
+	connHost = "localhost"
+	connPort = "8080"
+	connType = "tcp"
 )
 
 func main() {
-	listener, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	listener, err := net.Listen(connType, connHost+":"+connPort)
 	if err != nil {
-		log.Fatal("Error starting TCP server:", err)
+		logErrorAndCloseListener("Error starting TCP server: %v", err, listener)
 	}
-	defer listener.Close()
+	defer closeListener(listener)
 
-	log.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
+	log.Printf("Listening on %s:%s", connHost, connPort)
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Fatal("Error accepting connection:", err.Error())
+			logErrorAndCloseListener("Error accepting connection: %v", err, listener)
 		}
 		go handleRequest(conn)
+	}
+}
+
+func logErrorAndCloseListener(format string, err error, listener net.Listener) {
+	log.Printf(format, err)
+	closeListener(listener)
+}
+
+func closeListener(listener net.Listener) {
+	if err := listener.Close(); err != nil {
+		log.Printf("Error closing listener: %v", err)
 	}
 }
 
