@@ -19,9 +19,7 @@ func helloWorld(w http.ResponseWriter, r *http.Request) {
 }
 
 func BasicAuth(handler http.HandlerFunc, realm string) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		user, pass, ok := r.BasicAuth()
 
 		if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(ADMIN_USER)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(ADMIN_PASSWORD)) != 1 {
